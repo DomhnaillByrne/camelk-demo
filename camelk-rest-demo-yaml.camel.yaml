@@ -1,0 +1,37 @@
+- rest:
+    id: rest-fd2e
+    get:
+      - id: get-e09a
+        to: >-
+          https://d45d6576-7712-4ab2-8692-6d20f0b6d91b.mock.pstmn.io/get?bridgeEndpoint=true
+        path: get
+        bindingMode: json
+        produces: application/json
+        consumes: application/json
+- route:
+    id: route-0841
+    from:
+      uri: rest:get:demo-endpoint
+      id: from-daf5
+      steps:
+        - removeHeaders:
+            pattern: CamelHttp*
+            id: removeHeaders-7721
+            excludePattern: CamelHttpMethod
+        - to:
+            uri: kamelet:log-action
+            id: to-8042
+            parameters:
+              level: debug
+              showBody: true
+              showBodyType: true
+              showExchangePattern: true
+        - enrich:
+            id: enrich-e2a6
+            expression:
+              constant:
+                expression: rest-api:get:get?host=https://d45d6576-7712-4ab2-8692-6d20f0b6d91b.mock.pstmn.io
+                id: constant-dc86
+        - to:
+            uri: kamelet:log-sink
+            id: to-45c0
