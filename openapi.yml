@@ -1,0 +1,63 @@
+openapi: 3.0.2
+info:
+    title: camelk-demo-api
+    version: 1.0.0
+    description: Open API spec for Camelk demo
+servers:
+    -
+        url: 'http://localhost:3000'
+        description: ''
+paths:
+    /demo-endpoint:
+        post:
+            requestBody:
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ID'
+                required: true
+            responses:
+                '200':
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/UserObject'
+                    description: Successful response
+            operationId: inbound-post
+    /output-api:
+        get: {}
+        post:
+            requestBody:
+                content:
+                    application/json: {}
+                required: true
+            operationId: output-post
+components:
+    schemas:
+        UserObject:
+            title: Root Type for UserObject
+            description: ''
+            type: object
+            properties:
+                id:
+                    format: int32
+                    type: integer
+                name:
+                    type: string
+                age:
+                    format: int32
+                    type: integer
+            example:
+                id: 123456
+                name: Joe Blogs
+                licenceStatus: Suspended
+        ID:
+            title: Root Type for ID
+            description: Request Body for inbound API
+            type: object
+            properties:
+                id:
+                    format: int32
+                    type: integer
+            example:
+                id: 123456
