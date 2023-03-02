@@ -5,7 +5,6 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import org.json.simple.JSONObject;
 import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
 import org.json.simple.parser.JSONParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -44,6 +43,9 @@ public class DemoEnrichmentStrategy implements AggregationStrategy {
         JSONObject result = new JSONObject();
         try{
             result = (JSONObject) parser.parse(payload);  
+            LOGGER.info(result.toString());
+            result = (JSONObject) result.get("args");
+            LOGGER.info(result.toString());
         } catch (Exception e){
             LOGGER.error("JSON Parsing ", e);
         }

@@ -21,14 +21,14 @@
             id: enrich-e2a6
             expression:
               constant:
-                expression: http://localhost:3000/demo-api1
+                expression: "https://cb9cedc9-cef0-4ddc-83d0-a6b6a36066cb.mock.pstmn.io/get"
                 id: constant-6c4b
                 trim: true
         - enrich:
             id: enrich-c642
             expression:
               constant:
-                expression: http://localhost:3000/demo-api2
+                expression: "https://d45d6576-7712-4ab2-8692-6d20f0b6d91b.mock.pstmn.io/get"
                 id: constant-7c9c
             aggregationStrategy: DemoEnrichmentStrategy
         - log:
@@ -43,8 +43,8 @@
               showBodyType: true
               showExchangePattern: true
         - to:
-            uri: direct:output-post
-            id: parent-sink
+            uri: kamelet:log-sink
+            id: to-5946
 - route:
     id: route-1
     from:
