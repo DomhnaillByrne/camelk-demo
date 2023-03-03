@@ -21,14 +21,14 @@
             id: enrich-e2a6
             expression:
               constant:
-                expression: "https://cb9cedc9-cef0-4ddc-83d0-a6b6a36066cb.mock.pstmn.io/get"
+                expression: https://cb9cedc9-cef0-4ddc-83d0-a6b6a36066cb.mock.pstmn.io/get
                 id: constant-6c4b
                 trim: true
         - enrich:
             id: enrich-c642
             expression:
               constant:
-                expression: "https://d45d6576-7712-4ab2-8692-6d20f0b6d91b.mock.pstmn.io/get"
+                expression: https://d45d6576-7712-4ab2-8692-6d20f0b6d91b.mock.pstmn.io/get
                 id: constant-7c9c
             aggregationStrategy: DemoEnrichmentStrategy
         - log:
@@ -48,22 +48,60 @@
 - route:
     id: route-1
     from:
-      uri: direct:parent-route
+      uri: rest:get:google-endpoint
       id: from-3936
       steps:
+        - removeHeaders:
+            pattern: CamelHttp*
+            id: removeHeaders-request
+            excludePattern: CamelHttpMethod
         - log:
             message: route-1 triggered
             id: log-6b02
             loggingLevel: DEBUG
+        - enrich:
+            id: enrich-drive1
+            expression:
+              constant:
+                expression: https://cb9cedc9-cef0-4ddc-83d0-a6b6a36066cb.mock.pstmn.io/get
+                id: constant-6c4b
+                trim: true
+        - enrich:
+            id: enrich-drive2
+            expression:
+              constant:
+                expression: https://d45d6576-7712-4ab2-8692-6d20f0b6d91b.mock.pstmn.io/get
+                id: constant-7c9c
+            aggregationStrategy: DemoEnrichmentStrategy
+        - setBody:
+            id: setBody-0268
+            expression:
+              simple:
+                expression: ${body}
+                id: simple-4e49
+                resultType: java.lang.String
         - to:
-            uri: kamelet:log-sink
-            id: to-81e1
-- route:
-    id: route-fcad
-    from:
-      uri: direct:output-post
-      id: from-a08e
-      steps:
-        - log:
-            message: ${body}
-            id: log-output
+            uri: kamelet:log-action
+            id: to-f905
+            parameters:
+              showAllProperties: true
+              showBody: true
+              showBodyType: true
+              showExchangePattern: true
+              showProperties: true
+        - to:
+            uri: kamelet:postgresql-sink
+            id: to-43eb
+            parameters:
+              serverName: postgresql
+              username: postgresql
+              password: postgresql
+              databaseName: postgresql
+              query: INSERT INTO camel_demo (payload) VALUES (:#firstName)
+              serverPort: '5432'
+        - setBody:
+            id: setBody-d3ee
+            expression:
+              constant:
+                expression: '"Write to table complete"'
+                id: constant-d812
