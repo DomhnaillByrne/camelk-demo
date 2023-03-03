@@ -1,5 +1,5 @@
 - route:
-    id: route-0841
+    id: rest-endpoint
     from:
       uri: rest:get:demo-endpoint
       id: from-daf5
@@ -46,9 +46,9 @@
             uri: kamelet:log-sink
             id: to-5946
 - route:
-    id: route-1
+    id: postgres
     from:
-      uri: rest:get:google-endpoint
+      uri: rest:get:postgres-endpoint
       id: from-3936
       steps:
         - removeHeaders:
@@ -100,8 +100,74 @@
               query: INSERT INTO camel_demo (payload) VALUES (:#firstName)
               serverPort: '5432'
         - setBody:
-            id: setBody-d3ee
+            id: setBody-3b89
             expression:
               constant:
-                expression: '"Write to table complete"'
-                id: constant-d812
+                expression: Write to postgres done
+                id: constant-43a8
+        - to:
+            uri: kamelet:log-sink
+            id: to-c2eb
+- route:
+    id: mongo
+    from:
+      uri: rest:get:mongo-endpoint
+      id: from-3936
+      steps:
+        - removeHeaders:
+            pattern: CamelHttp*
+            id: removeHeaders-a543
+            excludePattern: CamelHttpMethod
+        - log:
+            message: route-1 triggered
+            id: log-65aa
+            loggingLevel: DEBUG
+        - enrich:
+            id: enrich-56de
+            expression:
+              constant:
+                expression: https://cb9cedc9-cef0-4ddc-83d0-a6b6a36066cb.mock.pstmn.io/get
+                id: constant-e379
+                trim: true
+        - enrich:
+            id: enrich-5585
+            expression:
+              constant:
+                expression: https://d45d6576-7712-4ab2-8692-6d20f0b6d91b.mock.pstmn.io/get
+                id: constant-99e5
+            aggregationStrategy: DemoEnrichmentStrategy
+        - setBody:
+            id: setBody-06c4
+            expression:
+              simple:
+                expression: ${body}
+                id: simple-4e49
+                resultType: java.lang.String
+        - to:
+            uri: kamelet:log-action
+            id: to-c61b
+            parameters:
+              showAllProperties: true
+              showBody: true
+              showBodyType: true
+              showExchangePattern: true
+              showProperties: true
+        - to:
+            uri: kamelet:mongodb-sink
+            id: to-58cb
+            parameters:
+              createCollection: true
+              hosts: mongo
+              collection: camelCollection
+              password: camel
+              username: camel
+              database: camel-demo-db
+        - setBody:
+            id: setBody-e182
+            expression:
+              constant:
+                expression: write to mongoDB done
+                id: constant-4cd7
+        - to:
+            uri: kamelet:log-sink
+            id: to-67bb
